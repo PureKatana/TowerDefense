@@ -26,6 +26,7 @@ public class Tower_Crossbow : Tower
             Debug.DrawLine(gunPoint.position, hit.point);
 
             visuals.TriggerLaserVisual(gunPoint.position, hit.point);
+            visuals.TriggerReloadFX(attackCooldown); 
         }
     }
 

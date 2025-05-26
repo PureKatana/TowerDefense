@@ -2948,7 +2948,7 @@ MonoBehaviour:
   whatIsEnemy:
     serializedVersion: 2
     m_Bits: 128
-  attackCooldown: 1
+  attackCooldown: 2
   gunPoint: {fileID: 1098559299}
 --- !u!114 &1818397155
 MonoBehaviour:
@@ -2964,6 +2964,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   laser: {fileID: 298453020}
   laserDuration: 0.1
+  crossbowMeshRenderer: {fileID: 5390663042286614340}
+  maxIntensity: 200
+  startColor: {r: 0, g: 0, b: 0, a: 1}
+  endColor: {r: 0.047058824, g: 0.7607843, b: 0.7921569, a: 1}
 --- !u!1 &1820756400
 GameObject:
   m_ObjectHideFlags: 0
