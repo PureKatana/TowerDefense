@@ -6,19 +6,29 @@ public class Tower : MonoBehaviour
     public Transform currentEnemy;
 
     [Header("Tower Setup")]
-    [SerializeField] private Transform towerHead;
-    [SerializeField] private float rotationSpeed;
+    [Space]
+    [SerializeField] protected Transform towerHead;
+    [SerializeField] protected float rotationSpeed = 10.0f;
 
-    [SerializeField] private float attackRange = 1.5f;
-    [SerializeField] private LayerMask whatIsEnemy;
+    [SerializeField] protected float attackRange = 2.5f;
+    [SerializeField] protected LayerMask whatIsEnemy;
 
-    private void Update()
+    [SerializeField] protected float attackCooldown = 2f;
+    protected float lastTimeAttacked;
+
+    protected virtual void Update()
     {
         if (currentEnemy == null)
         {
             currentEnemy = FindRandomEnemyWithinRange();
             return;
         }
+
+        if (CanAttackEnemy())
+        {
+            AttackEnemy();
+        }
+
 
         if (Vector3.Distance(transform.position, currentEnemy.position) > attackRange)
         {
@@ -28,7 +38,22 @@ public class Tower : MonoBehaviour
         RotateTowerTowardsEnemy();
     }
 
-    private void RotateTowerTowardsEnemy()
+    protected virtual void AttackEnemy()
+    {
+        //Debug.Log("Attacking enemy at : " + Time.time);
+    }
+
+    protected bool CanAttackEnemy()
+    {
+        if (Time.time >= lastTimeAttacked + attackCooldown)
+        {
+            lastTimeAttacked = Time.time;
+            return true;
+        }
+        return false;
+    }
+
+    protected virtual void RotateTowerTowardsEnemy()
     {
         if (currentEnemy != null)
         {
@@ -38,7 +63,7 @@ public class Tower : MonoBehaviour
         }
     }
 
-    private Transform FindRandomEnemyWithinRange()
+    protected Transform FindRandomEnemyWithinRange()
     {
         List<Transform> enemiesInRange = new List<Transform>();
         Collider[] enemiesColliders = Physics.OverlapSphere(transform.position, attackRange, whatIsEnemy);
@@ -53,7 +78,7 @@ public class Tower : MonoBehaviour
         return enemiesInRange.Count > 0 ? enemiesInRange[randomIndex] : null;
     }
 
-    private void OnDrawGizmos()
+    protected virtual void OnDrawGizmos()
     {
         if (towerHead != null)
         {
