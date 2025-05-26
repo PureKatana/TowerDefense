@@ -9,6 +9,7 @@ public class Tower : MonoBehaviour
     [Space]
     [SerializeField] protected Transform towerHead;
     [SerializeField] protected float rotationSpeed = 10.0f;
+    private bool canRotate = true;
 
     [SerializeField] protected float attackRange = 2.5f;
     [SerializeField] protected LayerMask whatIsEnemy;
@@ -16,6 +17,10 @@ public class Tower : MonoBehaviour
     [SerializeField] protected float attackCooldown = 2f;
     protected float lastTimeAttacked;
 
+    protected virtual void Awake()
+    {
+        
+    }
     protected virtual void Update()
     {
         if (currentEnemy == null)
@@ -53,9 +58,14 @@ public class Tower : MonoBehaviour
         return false;
     }
 
+    public void EnableRotation(bool enable)
+    {
+        canRotate = enable;
+    }
+
     protected virtual void RotateTowerTowardsEnemy()
     {
-        if (currentEnemy != null)
+        if (canRotate && currentEnemy != null)
         {
             Vector3 direction = currentEnemy.position - towerHead.position;
             Quaternion lookRotation = Quaternion.LookRotation(direction);
