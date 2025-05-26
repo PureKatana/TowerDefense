@@ -63,6 +63,11 @@ public class Tower : MonoBehaviour
         }
     }
 
+    protected Vector3 GetDirectionToEnemyFrom(Transform startPoint)
+    {
+        return (currentEnemy.position - startPoint.position).normalized;
+    }
+
     protected Transform FindRandomEnemyWithinRange()
     {
         List<Transform> enemiesInRange = new List<Transform>();
