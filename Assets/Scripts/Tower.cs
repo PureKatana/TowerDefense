@@ -13,6 +13,7 @@ public class Tower : MonoBehaviour
 
     [SerializeField] protected float attackRange = 2.5f;
     [SerializeField] protected LayerMask whatIsEnemy;
+    [SerializeField] protected float attackDamage = 100f;
 
     [SerializeField] protected float attackCooldown = 2f;
     protected float lastTimeAttacked;

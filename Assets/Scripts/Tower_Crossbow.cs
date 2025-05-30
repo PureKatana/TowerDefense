@@ -22,11 +22,15 @@ public class Tower_Crossbow : Tower
             // Snappy effect
             towerHead.forward = directionToEnemy;
 
-            Debug.Log(hit.collider.gameObject.name + " hit at " + hit.point);
-            Debug.DrawLine(gunPoint.position, hit.point);
-
             visuals.TriggerLaserVisual(gunPoint.position, hit.point);
             visuals.TriggerReloadFX(attackCooldown); 
+
+            IDamageable damageable = hit.transform.GetComponent<IDamageable>();
+
+            if (damageable != null)
+            {
+                damageable.TakeDamage(attackDamage);
+            }
         }
     }
 
