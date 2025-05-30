@@ -21,19 +21,68 @@ public class Tower_Crossbow_Visuals : MonoBehaviour
     [SerializeField] private Color startColor;
     [SerializeField] private Color endColor;
 
+    [Header("Rotor Visuals")]
+    [Space]
+    [SerializeField] private Transform rotor;
+    [SerializeField] private Transform rotorLoaded;
+    [SerializeField] private Transform rotorUnloaded;
+
+    [Header("Front String Visuals")]
+    [Space]
+    [SerializeField] private LineRenderer frontStringRenderer_L;
+    [SerializeField] private LineRenderer frontStringRenderer_R;
+    [Space]
+    [SerializeField] private Transform frontStringStartPoint_L;
+    [SerializeField] private Transform frontStringEndPoint_L;
+    [SerializeField] private Transform frontStringStartPoint_R;
+    [SerializeField] private Transform frontStringEndPoint_R;
+
+    [Header("Back String Visuals")]
+    [Space]
+    [SerializeField] private LineRenderer backStringRenderer_L;
+    [SerializeField] private LineRenderer backStringRenderer_R;
+    [Space]
+    [SerializeField] private Transform backStringStartPoint_L;
+    [SerializeField] private Transform backStringEndPoint_L;
+    [SerializeField] private Transform backStringStartPoint_R;
+    [SerializeField] private Transform backStringEndPoint_R;
+
+    [SerializeField] private LineRenderer[] lineRenderers;
+
+
     private void Awake()
     {
         towerCrossbow = GetComponent<Tower_Crossbow>();
         glowingMaterial = new Material(crossbowMeshRenderer.material); // Create a new instance to avoid modifying the original material
-
         crossbowMeshRenderer.material = glowingMaterial; // Assign the new material to the mesh renderer
 
+        AssignGlowingMaterialToLines();
+
         StartCoroutine(ChangeEmission(1.0f)); // Initialize the emission color
+
+        rotor.position = rotorLoaded.position; // Start with the rotor in the loaded position
+    }
+
+    private void AssignGlowingMaterialToLines()
+    {
+        foreach (LineRenderer lineRenderer in lineRenderers)
+        {
+            lineRenderer.material = glowingMaterial; // Assign the glowing material to all line renderers
+        }
     }
 
     private void Update()
     {
         UpdateEmissionColor();
+        UpdateStrings();
+    }
+
+    private void UpdateStrings()
+    {
+        UpdateStringsVisuals(frontStringRenderer_L, frontStringStartPoint_L, frontStringEndPoint_L);
+        UpdateStringsVisuals(frontStringRenderer_R, frontStringStartPoint_R, frontStringEndPoint_R);
+        UpdateStringsVisuals(backStringRenderer_L, backStringStartPoint_L, backStringEndPoint_L);
+        UpdateStringsVisuals(backStringRenderer_R, backStringStartPoint_R, backStringEndPoint_R);
     }
 
     private void UpdateEmissionColor()
@@ -45,7 +94,10 @@ public class Tower_Crossbow_Visuals : MonoBehaviour
 
     public void TriggerReloadFX(float duration)
     {
-        StartCoroutine(ChangeEmission(duration / 2));
+        float newDuration = duration / 2.0f;
+
+        StartCoroutine(ChangeEmission(newDuration));
+        StartCoroutine(UpdateRotorPosition(newDuration));
     }
 
     public void TriggerLaserVisual(Vector3 startPosition, Vector3 endPosition)
@@ -80,5 +132,25 @@ public class Tower_Crossbow_Visuals : MonoBehaviour
         }
 
         currentIntensity = maxIntensity; // Ensure we end at the max intensity
+    }
+
+    private IEnumerator UpdateRotorPosition(float duration)
+    {
+        float startTime = Time.time;
+
+        while (Time.time < startTime + duration)
+        {
+            float t = (Time.time - startTime) / duration;
+            rotor.position = Vector3.Lerp(rotorUnloaded.position, rotorLoaded.position, t);
+            yield return null;
+        }
+
+        rotor.position = rotorLoaded.position; // Ensure we end at the loaded position
+    }
+
+    private void UpdateStringsVisuals(LineRenderer lineRenderer, Transform startPoint, Transform endPoint)
+    {
+        lineRenderer.SetPosition(0, startPoint.position);
+        lineRenderer.SetPosition(1, endPoint.position);
     }
 }
