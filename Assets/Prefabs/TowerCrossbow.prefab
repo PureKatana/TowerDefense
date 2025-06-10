@@ -1836,7 +1836,9 @@ MonoBehaviour:
   whatIsEnemy:
     serializedVersion: 2
     m_Bits: 128
+  attackDamage: 100
   attackCooldown: 2
+  enemyPriorityType: 1
   gunPoint: {fileID: 623824790821569688}
 --- !u!114 &3336388172251867633
 MonoBehaviour:

@@ -2671,8 +2671,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentWave:
-    basicEnemyCount: 4
-    fastEnemyCount: 2
+    basicEnemyCount: 10
+    fastEnemyCount: 5
   respawnPoint: {fileID: 543450652550366733}
   spawnCooldown: 2
   basicEnemy: {fileID: 4649377479136664909, guid: 2b05d43d315001f439a1b17ed933c174, type: 3}
@@ -3415,12 +3415,20 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1559830821591277052, guid: bebc328bbd8329440b659bf1571967b4, type: 3}
+      propertyPath: attackRange
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1559830821591277052, guid: bebc328bbd8329440b659bf1571967b4, type: 3}
       propertyPath: attackDamage
-      value: 0
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 1559830821591277052, guid: bebc328bbd8329440b659bf1571967b4, type: 3}
       propertyPath: attackCooldown
-      value: 0.5
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1559830821591277052, guid: bebc328bbd8329440b659bf1571967b4, type: 3}
+      propertyPath: enemyPriorityType
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7652105554256945089, guid: bebc328bbd8329440b659bf1571967b4, type: 3}
       propertyPath: m_Name

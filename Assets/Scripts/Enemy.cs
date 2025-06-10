@@ -1,13 +1,22 @@
 using UnityEngine;
 using UnityEngine.AI;
 
+public enum EnemyType
+{
+    Basic,
+    Fast,
+    None
+}
+
 public class Enemy : MonoBehaviour, IDamageable
 {
     private NavMeshAgent agent;
+    [SerializeField] private Transform centerPoint;
 
     [Header("Enemy Settings")]
     [Space]
     public float health = 100.0f;
+    [SerializeField] private EnemyType enemyType;
 
     [Header("Movement Settings")]
     [Space]
@@ -15,7 +24,7 @@ public class Enemy : MonoBehaviour, IDamageable
     [SerializeField] private Transform[] waypoints;
     private int waypointIndex;
 
-    public float totalDistance = 0.0f;
+    private float totalDistance = 0.0f;
 
     private void Awake()
     {
@@ -92,4 +101,9 @@ public class Enemy : MonoBehaviour, IDamageable
             Destroy(gameObject);
         }
     }
+
+    public Vector3 GetCenterPoint() => centerPoint.position;
+
+    public EnemyType GetEnemyType() => enemyType;
+
 }

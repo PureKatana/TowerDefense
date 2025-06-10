@@ -3,30 +3,38 @@ using UnityEngine;
 
 public class Tower : MonoBehaviour
 {
-    public Transform currentEnemy;
+    public Enemy currentEnemy;
 
     [Header("Tower Setup")]
     [Space]
     [SerializeField] protected Transform towerHead;
     [SerializeField] protected float rotationSpeed = 10.0f;
     private bool canRotate = true;
-
+    [Space]
     [SerializeField] protected float attackRange = 2.5f;
     [SerializeField] protected LayerMask whatIsEnemy;
     [SerializeField] protected float attackDamage = 100f;
-
     [SerializeField] protected float attackCooldown = 2f;
     protected float lastTimeAttacked;
+    [Space]
+    [SerializeField] protected EnemyType enemyPriorityType = EnemyType.None;
+    [Space]
+    [Tooltip("Enabling this will make the tower change target between attacks")]
+    [SerializeField] private bool dynamicTargetChange = true;
+    private float targetCheckInterval = 0.1f;
+    private float lastTargetCheckTime = 0f;
 
     protected virtual void Awake()
     {
-        
+        EnableRotation(true);
     }
     protected virtual void Update()
     {
+        UpdateTargetDynamically();
+
         if (currentEnemy == null)
         {
-            currentEnemy = FindRandomEnemyWithinRange();
+            currentEnemy = FindEnemyWithinRange();
             return;
         }
 
@@ -36,12 +44,25 @@ public class Tower : MonoBehaviour
         }
 
 
-        if (Vector3.Distance(transform.position, currentEnemy.position) > attackRange)
+        if (Vector3.Distance(transform.position, currentEnemy.GetCenterPoint()) > attackRange)
         {
             currentEnemy = null;
         }
 
         RotateTowerTowardsEnemy();
+    }
+
+    private void UpdateTargetDynamically()
+    {
+        if (dynamicTargetChange && Time.time >= lastTargetCheckTime + targetCheckInterval)
+        {
+            lastTargetCheckTime = Time.time;
+            Enemy newEnemy = FindEnemyWithinRange();
+            if (newEnemy != null && newEnemy != currentEnemy)
+            {
+                currentEnemy = newEnemy;
+            }
+        }
     }
 
     protected virtual void AttackEnemy()
@@ -68,7 +89,7 @@ public class Tower : MonoBehaviour
     {
         if (canRotate && currentEnemy != null)
         {
-            Vector3 direction = currentEnemy.position - towerHead.position;
+            Vector3 direction = GetDirectionToEnemyFrom(towerHead);
             Quaternion lookRotation = Quaternion.LookRotation(direction);
             towerHead.rotation = Quaternion.Slerp(towerHead.rotation, lookRotation, Time.deltaTime * rotationSpeed);
         }
@@ -76,28 +97,42 @@ public class Tower : MonoBehaviour
 
     protected Vector3 GetDirectionToEnemyFrom(Transform startPoint)
     {
-        return (currentEnemy.position - startPoint.position).normalized;
+        return (currentEnemy.GetCenterPoint() - startPoint.position).normalized;
     }
 
-    protected Transform FindRandomEnemyWithinRange()
+    protected Enemy FindEnemyWithinRange()
     {
+        List<Enemy> priorityEnemies = new List<Enemy>();
         List<Enemy> enemiesInRange = new List<Enemy>();
         Collider[] enemiesColliders = Physics.OverlapSphere(transform.position, attackRange, whatIsEnemy);
 
         foreach (Collider enemyCollider in enemiesColliders)
         {
             Enemy enemy = enemyCollider.GetComponent<Enemy>();
+            EnemyType enemyType = enemy != null ? enemy.GetEnemyType() : EnemyType.None;
 
-            if (enemy != null && enemy.gameObject.activeInHierarchy)
+            if (enemy != null)
             {
-                enemiesInRange.Add(enemy);
+                if (enemyType == enemyPriorityType)
+                {
+                    priorityEnemies.Add(enemy);
+                }
+                else
+                {
+                    enemiesInRange.Add(enemy);
+                }
             }
+        }
+
+        if (priorityEnemies.Count > 0)
+        {
+            return GetClosestEnemy(priorityEnemies);
         }
 
         return GetClosestEnemy(enemiesInRange);
     }
 
-    private static Transform GetClosestEnemy(List<Enemy> enemiesInRange)
+    private static Enemy GetClosestEnemy(List<Enemy> enemiesInRange)
     {
         Enemy closestEnemy = null;
         float minRemainingDistance = float.MaxValue;
@@ -112,7 +147,7 @@ public class Tower : MonoBehaviour
             }
         }
 
-        return closestEnemy != null ? closestEnemy.transform : null;
+        return closestEnemy != null ? closestEnemy : null;
     }
 
     protected virtual void OnDrawGizmos()

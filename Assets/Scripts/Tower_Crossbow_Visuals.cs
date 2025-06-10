@@ -4,6 +4,7 @@ using UnityEngine;
 public class Tower_Crossbow_Visuals : MonoBehaviour
 {
     private Tower_Crossbow towerCrossbow;
+    private Enemy enemy;
 
     [Header("Crossbow Visuals")]
     [Space]
@@ -75,6 +76,12 @@ public class Tower_Crossbow_Visuals : MonoBehaviour
     {
         UpdateEmissionColor();
         UpdateStrings();
+
+        if (laser.enabled && enemy != null)
+        {
+            // Update the laser position to follow the current enemy
+            laser.SetPosition(1, enemy.GetCenterPoint());
+        }
     }
 
     private void UpdateStrings()
@@ -107,7 +114,7 @@ public class Tower_Crossbow_Visuals : MonoBehaviour
 
     private IEnumerator ShowLaserCoroutine(Vector3 startPosition, Vector3 endPosition)
     {
-        towerCrossbow.EnableRotation(false);
+        enemy = towerCrossbow.currentEnemy; // Get the current enemy for the laser effect
         laser.enabled = true;
 
         laser.SetPosition(0, startPosition);
@@ -116,7 +123,6 @@ public class Tower_Crossbow_Visuals : MonoBehaviour
         yield return new WaitForSeconds(laserDuration);
 
         laser.enabled = false;
-        towerCrossbow.EnableRotation(true);
     }
 
     private IEnumerator ChangeEmission(float duration)
