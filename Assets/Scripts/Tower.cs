@@ -81,17 +81,38 @@ public class Tower : MonoBehaviour
 
     protected Transform FindRandomEnemyWithinRange()
     {
-        List<Transform> enemiesInRange = new List<Transform>();
+        List<Enemy> enemiesInRange = new List<Enemy>();
         Collider[] enemiesColliders = Physics.OverlapSphere(transform.position, attackRange, whatIsEnemy);
 
         foreach (Collider enemyCollider in enemiesColliders)
         {
-            enemiesInRange.Add(enemyCollider.transform);
+            Enemy enemy = enemyCollider.GetComponent<Enemy>();
+
+            if (enemy != null && enemy.gameObject.activeInHierarchy)
+            {
+                enemiesInRange.Add(enemy);
+            }
         }
 
-        int randomIndex = Random.Range(0, enemiesInRange.Count);
+        return GetClosestEnemy(enemiesInRange);
+    }
 
-        return enemiesInRange.Count > 0 ? enemiesInRange[randomIndex] : null;
+    private static Transform GetClosestEnemy(List<Enemy> enemiesInRange)
+    {
+        Enemy closestEnemy = null;
+        float minRemainingDistance = float.MaxValue;
+
+        foreach (Enemy enemy in enemiesInRange)
+        {
+            float remainingDistance = enemy.GetDistanceToFinishLine();
+            if (remainingDistance < minRemainingDistance)
+            {
+                minRemainingDistance = remainingDistance;
+                closestEnemy = enemy;
+            }
+        }
+
+        return closestEnemy != null ? closestEnemy.transform : null;
     }
 
     protected virtual void OnDrawGizmos()
